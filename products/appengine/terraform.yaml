@@ -64,7 +64,14 @@ overrides: !ruby/object:Overrides::ResourceOverrides
         test_env_vars:
           org_id: :ORG_ID
   Service: !ruby/object:Overrides::Terraform::ResourceOverride
-    exclude: true
+    id_format: "apps/{{project}}/services/{{name}}"
+    import_format: ["apps/{{project}}/services/{{name}}"]
+    mutex: "apps/{{project}}/services/{{name}}"
+    properties:
+      id: !ruby/object:Overrides::Terraform::PropertyOverride
+        name: 'service_id'
+      split.allocations: !ruby/object:Overrides::Terraform::PropertyOverride
+        custom_flatten: templates/terraform/custom_flatten/float64_to_string.go.erb
 # This is for copying files over
 files: !ruby/object:Provider::Config::Files
   # These files have templating (ERB) code that will be run.
