@@ -149,7 +149,6 @@ module Provider
       docs_folder = File.join(data.output_folder, 'docs', 'resources')
 
       name = plural ? base_name.pluralize : base_name
-
       data.name = name
       data.plural = plural
       data.doc_generation = true

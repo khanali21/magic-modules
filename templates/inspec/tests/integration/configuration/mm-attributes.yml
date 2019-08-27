@@ -221,3 +221,14 @@ regional_node_pool:
   cluster_name: inspec-gcp-regional-node-pool-cluster
   node_count: 1
   initial_node_count: 1
+
+appengine:
+  version_id: v1
+  service: default
+  runtime: nodejs10
+  entrypoint: hello
+  env_var_value: val1	  
+  security_level: SECURE_OPTIONAL
+  upload_path_regex: stylesheets/.*
+  path: stylesheets/
+  url_regex: /stylesheets/(.*) 

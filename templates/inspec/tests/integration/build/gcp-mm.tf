@@ -141,6 +141,10 @@ variable "region_backend_service" {
   type = "map"
 }
 
+variable "appengine" {
+  type = "map"
+}
+
 resource "google_compute_ssl_policy" "custom-ssl-policy" {
   name            = "${var.ssl_policy["name"]}"
   min_tls_version = "${var.ssl_policy["min_tls_version"]}"
@@ -552,4 +556,39 @@ resource "google_container_node_pool" "inspec-gcp-regional-node-pool" {
   region     = "${var.gcp_location}"
   cluster    = "${google_container_cluster.gcp-inspec-regional-cluster.name}"
   node_count = "${var.regional_node_pool["node_count"]}"
+}
+
+resource "google_app_engine_application" "app" {
+  project     = "${var.gcp_project_id}"
+  location_id = "${var.gcp_location}"
+}
+
+resource "google_app_engine_standard_app_version" "myapp" {
+  version_id = "${var.appengine["version_id"]}"
+  service    = "${var.appengine["service"]}"
+  runtime    = "${var.appengine["runtime"]}"
+
+   entrypoint {
+    shell = "${var.appengine["entrypoint"]}"
+  }
+
+   handlers {
+    security_level = "${var.appengine["security_level"]}"
+    static_files {
+      path              = "${var.appengine["path"]}"
+      upload_path_regex = "${var.appengine["upload_path_regex"]}"
+    }
+
+     url_regex =  "${var.appengine["url_regex"]}"
+  }
+
+   deployment {
+    zip {
+      source_url = "../configuration/index.js.zip"
+    }
+  }
+
+   env_variables = {
+    MY_ENV_VAR = "${var.appengine["env_var_value"]}"
+  }
 }
