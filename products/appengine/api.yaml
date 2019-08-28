@@ -73,24 +73,36 @@ objects:
       For example, an application that handles customer requests might include separate services to handle tasks such as backend data analysis or API requests from mobile devices. 
       Each service has a collection of versions that define a specific set of code used to implement the functionality of that service.
     base_url: 'apps/{{project}}/services'
-    self_link: 'apps/{{project}}/services/{{name}}'
-    update_url: 'apps/{{project}}/services/{{name}}'
+    update_url: 'apps/{{project}}/services/{{service_id}}?migrateTraffic=False&updateMask=split'
     update_verb: :PATCH
     references: !ruby/object:Api::Resource::ReferenceLinks
-      guides:
-        'Official Documentation':
-          'https://cloud.google.com/appengine/docs/admin-api/deploying-overview'
       api: 'https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services'
+    async: !ruby/object:Api::Async
+      operation: !ruby/object:Api::Async::Operation
+        kind: 'appengine#operation'
+        path: 'name'
+        base_url: 'projects/{{project}}/global/operations/{{op_id}}'
+        wait_ms: 1000
+      result: !ruby/object:Api::Async::Result
+        path: 'targetLink'
+      status: !ruby/object:Api::Async::Status
+        path: 'status'
+        complete: 'DONE'
+        allowed:
+          - 'PENDING'
+          - 'RUNNING'
+          - 'DONE'
+      error: !ruby/object:Api::Async::Error
+        path: 'error/errors'
+        message: 'message'
     properties:
       - !ruby/object:Api::Type::String
         name: 'name'
-        output: true
         description: |
           Full path to the Service resource in the API. Example apps/myapp/services/default.
           This field is used in responses only. Any value specified here in a request is ignored.
       - !ruby/object:Api::Type::String
         name: 'id'
-        output: true
         description: |
            Relative name of the service within the application. Example default.
       - !ruby/object:Api::Type::NestedObject
@@ -167,7 +179,7 @@ objects:
         name: 'id'
         input: true
         description: |
-          Relative name of the version within the service. Example v1. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names,"default", "latest", and any name with the prefix "ah-". 
+          Relative name of the version within the service. For example, `v1`. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names,"default", "latest", and any name with the prefix "ah-". 
       - !ruby/object:Api::Type::String
         name: 'runtime'
         description: |
